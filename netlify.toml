@@ -11,7 +11,7 @@
   skip_processing = false
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
 
 # Environment variables (set these in Netlify UI)
 # DISCORD_WEBHOOK_URL

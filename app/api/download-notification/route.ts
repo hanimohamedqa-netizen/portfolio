@@ -154,7 +154,10 @@ export async function POST(request: NextRequest) {
     let notificationSent = false;
 
     // Try Discord Webhook (UNLIMITED & FREE - RECOMMENDED!)
-    if (process.env.DISCORD_WEBHOOK_URL) {
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    console.log('🔍 Discord Webhook URL exists:', !!webhookUrl);
+
+    if (webhookUrl) {
       try {
         const discordEmbed = {
           embeds: [{
@@ -176,19 +179,27 @@ export async function POST(request: NextRequest) {
           }]
         };
 
-        const discordRes = await fetch(process.env.DISCORD_WEBHOOK_URL, {
+        console.log('📤 Sending Discord notification...');
+        const discordRes = await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(discordEmbed),
         });
 
+        console.log('📬 Discord response status:', discordRes.status);
+
         if (discordRes.ok) {
           notificationSent = true;
-          console.log('✅ Discord notification sent');
+          console.log('✅ Discord notification sent successfully');
+        } else {
+          const errorText = await discordRes.text();
+          console.error('❌ Discord webhook failed with status:', discordRes.status, 'Error:', errorText);
         }
       } catch (error) {
-        console.error('Discord webhook failed:', error);
+        console.error('❌ Discord webhook error:', error);
       }
+    } else {
+      console.log('⚠️ DISCORD_WEBHOOK_URL environment variable is not set');
     }
 
     // Try Resend Email (100/day limit)

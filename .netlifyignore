@@ -1,0 +1,25 @@
+# Don't upload node_modules - Netlify will install dependencies
+node_modules/
+
+# Don't upload build output - Netlify will build the project
+.next/
+
+# Don't upload development files
+.env.local
+.env*.local
+
+# Don't upload git folder
+.git/
+
+# Don't upload documentation
+*.md
+!README.md
+
+# Don't upload editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Don't upload cache
+.cache/

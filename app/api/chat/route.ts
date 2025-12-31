@@ -124,7 +124,8 @@ function getIntelligentResponse(message: string): string {
   if (/project|work on|portfolio|built|developed|tested/i.test(lowerMessage)) {
     if (/current|now|present|recent/i.test(lowerMessage)) {
       const current = CV_DATA.projects[0];
-      return `Hani is currently working on the **${current.name}** - a ${current.domain} system. This involves ${current.tech.join(', ')}, focusing on order tracking and admin management for streamlined operations.`;
+      const techStack = current.tech ? `This involves ${current.tech.join(', ')}, focusing on order tracking and admin management for streamlined operations.` : 'He focuses on comprehensive QA testing for order tracking and admin management.';
+      return `Hani is currently working on the **${current.name}** - a ${current.domain} system. ${techStack}`;
     }
     if (/government|oman/i.test(lowerMessage)) {
       const gov = CV_DATA.projects.find(p => p.name.includes('Maktaby'));

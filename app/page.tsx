@@ -4,10 +4,8 @@ import { motion } from 'framer-motion';
 import { Download, Mail, Github, Linkedin, Code, CheckCircle2, Award, Briefcase, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import AIChat from '@/components/AIChat';
-import PuzzleModal from '@/components/PuzzleModal';
 
 export default function Home() {
-  const [showPuzzleModal, setShowPuzzleModal] = useState(false);
   const [currentQuote, setCurrentQuote] = useState(0);
   const [showQuote, setShowQuote] = useState(false);
 
@@ -97,22 +95,19 @@ export default function Home() {
     };
   }, []);
 
-  const handleDownload = () => {
-    setShowPuzzleModal(true);
-  };
-
-  const handlePuzzleSuccess = async (name: string) => {
+  const handleDownload = async () => {
     try {
+      // Send notification
       await fetch('/api/download-notification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, timestamp: new Date().toISOString() }),
+        body: JSON.stringify({ name: 'Anonymous', timestamp: new Date().toISOString() }),
       });
     } catch (error) {
       console.error('Failed to send notification:', error);
     }
 
-    // Trigger download
+    // Trigger download immediately
     const link = document.createElement('a');
     link.href = '/cv.pdf';
     link.download = 'Hani-Mohamed-Sayed-CV.pdf';
@@ -689,7 +684,7 @@ export default function Home() {
       </section>
 
       <footer className="py-8 bg-gray-900 text-gray-400 text-center">
-        <p>© 2026 Hani Mohamed.</p>
+        <p>© 2026 Hani Mohamed</p>
       </footer>
 
       {/* Rotating Quote Popup */}
@@ -714,11 +709,6 @@ export default function Home() {
       </motion.div>
 
       <AIChat />
-      <PuzzleModal
-        isOpen={showPuzzleModal}
-        onClose={() => setShowPuzzleModal(false)}
-        onSuccess={handlePuzzleSuccess}
-      />
     </main>
   );
 }

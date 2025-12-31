@@ -158,6 +158,15 @@ export default function Home() {
                 Delivering quality across <span className="font-semibold text-indigo-600">web, mobile, and enterprise applications</span> in diverse industries.
               </p>
 
+              <motion.blockquote
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-lg italic text-gray-700 mb-8 pl-4 border-l-4 border-indigo-600"
+              >
+                "Ain't no map for this life road; we draw it our own way, and love keeps it real"
+              </motion.blockquote>
+
               <div className="flex flex-wrap gap-4 mb-8">
                 <motion.button
                   onClick={handleDownload}

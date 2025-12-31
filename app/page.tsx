@@ -689,7 +689,7 @@ export default function Home() {
       </section>
 
       <footer className="py-8 bg-gray-900 text-gray-400 text-center">
-        <p>© 2024 Hani Mohamed. All rights reserved.</p>
+        <p>© 2026 Hani Mohamed.</p>
       </footer>
 
       {/* Rotating Quote Popup */}

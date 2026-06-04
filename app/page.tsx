@@ -1,723 +1,595 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Download, Mail, Github, Linkedin, Code, CheckCircle2, Award, Briefcase, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import AIChat from '@/components/AIChat';
+import { motion } from 'framer-motion';
+import { ExternalLink, Mail, Github, Linkedin, Award, CheckCircle, Bug, ArrowUpRight } from 'lucide-react';
+import Image from 'next/image';
+import AIChat from '../components/AIChat';
 
-export default function Home() {
-  const [currentQuote, setCurrentQuote] = useState(0);
-  const [showQuote, setShowQuote] = useState(false);
+const workingProjects = [
+  {
+    name: 'Tracking Management System',
+    domain: 'Logistics',
+    summary: 'Designed and executed manual, UI, and API test suites to validate complex shipment tracking, routing algorithms, and multi-tenant inventory workflows managed via Azure DevOps.',
+    tech: ['Manual Testing', 'UI Testing', 'API Testing', 'Azure DevOps'],
+  },
+  {
+    name: 'E-Justice',
+    domain: 'Legal Services',
+    summary: 'Conducted robust functional, mobile, and API testing using Postman to verify secure e-filing portals, case management lifecycles, and role-based access control policies.',
+    tech: ['Manual Testing', 'UI Testing', 'Postman', 'Mobile Testing'],
+  },
+  {
+    name: 'Key2Bus',
+    domain: 'Transportation',
+    summary: 'Performed end-to-end mobile and API testing, validating real-time GPS coordinates, vehicle dispatching feeds, and user ticketing flows across iOS and Android devices.',
+    tech: ['Mobile Testing', 'API Testing', 'GPS Tracking'],
+  },
+  {
+    name: 'Consultant Platform',
+    domain: 'Professional Services',
+    summary: 'Engineered automated regression suites using Selenium WebDriver and executed load/stress tests with Gatling to ensure low-latency performance and high reliability.',
+    tech: ['Selenium WebDriver', 'Gatling', 'Performance Testing'],
+  },
+  {
+    name: 'Maktaby & Helpdesk',
+    domain: 'Government',
+    summary: 'Validated cross-platform ticket dispatching workflows with backend database testing using TestNG, ensuring data integrity across complex transaction cycles.',
+    tech: ['Cross-platform', 'TestNG', 'Database Testing'],
+  },
+];
 
-  // Inspirational quotes array (Testing, Tech, Psychology)
-  const quotes = [
-    { text: "Quality is not an act, it is a habit.", author: "Aristotle", category: "Philosophy" },
-    { text: "Testing shows the presence, not the absence of bugs.", author: "Edsger Dijkstra", category: "Testing" },
-    { text: "The mind is everything. What you think you become.", author: "Buddha", category: "Psychology" },
-    { text: "Code never lies, comments sometimes do.", author: "Ron Jeffries", category: "Tech" },
-    { text: "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.", author: "Martin Fowler", category: "Tech" },
-    { text: "The only way to do great work is to love what you do.", author: "Steve Jobs", category: "Philosophy" },
-    { text: "A bug is never just a mistake. It represents something bigger. An error of thinking that makes you who you are.", author: "Mr. Robot", category: "Tech" },
-    { text: "Your limitation—it's only your imagination.", author: "Unknown", category: "Psychology" },
-    { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela", category: "Philosophy" },
-    { text: "Walking on water and developing software from a specification are easy if both are frozen.", author: "Edward V. Berard", category: "Tech" },
-    { text: "Change your thoughts and you change your world.", author: "Norman Vincent Peale", category: "Psychology" },
-    { text: "Testing can only prove the presence of bugs, not their absence.", author: "Edsger Dijkstra", category: "Testing" },
-    { text: "First, solve the problem. Then, write the code.", author: "John Johnson", category: "Tech" },
-    { text: "The only impossible journey is the one you never begin.", author: "Tony Robbins", category: "Psychology" },
-    { text: "Automation is good, so long as you know exactly where to put the machine.", author: "Eliyahu Goldratt", category: "Testing" },
-    { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt", category: "Psychology" },
-    { text: "Software testing is not just finding bugs, it's about preventing them.", author: "Unknown", category: "Testing" },
-    { text: "The best error message is the one that never shows up.", author: "Thomas Fuchs", category: "Tech" },
-    { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill", category: "Philosophy" },
-    { text: "A good test case is one that has a high probability of finding an undiscovered error.", author: "Glen Myers", category: "Testing" },
-    { text: "What we think, we become.", author: "Buddha", category: "Psychology" },
-    { text: "Programs must be written for people to read, and only incidentally for machines to execute.", author: "Harold Abelson", category: "Tech" },
-    { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown", category: "Psychology" },
-    { text: "If debugging is the process of removing bugs, then programming must be the process of putting them in.", author: "Edsger Dijkstra", category: "Tech" },
-    { text: "Quality is everyone's responsibility.", author: "W. Edwards Deming", category: "Testing" },
-    { text: "The only person you are destined to become is the person you decide to be.", author: "Ralph Waldo Emerson", category: "Philosophy" },
-    { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson", category: "Psychology" },
-    { text: "Experience is the name everyone gives to their mistakes.", author: "Oscar Wilde", category: "Philosophy" },
-    { text: "Good testing is a combination of following rules and breaking them.", author: "James Bach", category: "Testing" },
-    { text: "The function of good software is to make the complex appear to be simple.", author: "Grady Booch", category: "Tech" },
-  ];
+const technicalPrototypes = [
+  {
+    name: 'SIMA - AI-Powered Code Generation Suite',
+    domain: 'AI / Developer Tools',
+    summary: 'Engineered a code generation suite using LLM integration and prompt engineering to automate developer workflows.',
+    tech: ['LLM Integration', 'Prompt Engineering', 'AI Automation'],
+    link: 'https://siima.netlify.app/',
+  },
+  {
+    name: 'Egxos - AI Market Predictor',
+    domain: 'Algorithmic FinTech',
+    summary: 'Developed Egxos, an algorithmic engine tailored for the Egyptian Stock Exchange (EGX) to forecast market trends.',
+    tech: ['Financial Modeling', 'Data Analysis'],
+  },
+];
 
-  // Track visitor when page loads
-  useEffect(() => {
-    const trackVisitor = async () => {
-      // Check if already tracked in this session
-      if (sessionStorage.getItem('visitor_tracked')) {
-        return;
-      }
+const skillCategories = [
+  {
+    title: 'Test Automation',
+    skills: ['Selenium WebDriver', 'TestNG', 'SHAFT Engine', 'Appium', 'Playwright'],
+  },
+  {
+    title: 'API & Performance',
+    skills: ['RestAssured', 'Postman', 'JMeter', 'Apache Benchmark', 'Swagger'],
+  },
+  {
+    title: 'Domain Expertise',
+    skills: ['Manual Testing', 'Test Planning', 'Bug Reporting', 'Regression Testing', 'ISTQB Methodology'],
+  },
+  {
+    title: 'Development & Tools',
+    skills: ['Java', 'Git & GitHub', 'JIRA', 'Jenkins', 'SQL'],
+  },
+];
 
-      try {
-        await fetch('/api/visitor-tracking', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            timestamp: new Date().toISOString(),
-            page: window.location.pathname
-          }),
-        });
-
-        // Mark as tracked for this session
-        sessionStorage.setItem('visitor_tracked', 'true');
-      } catch (error) {
-        console.error('Failed to track visitor:', error);
-      }
-    };
-
-    // Track after a short delay to ensure page is loaded
-    const timer = setTimeout(trackVisitor, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Rotating quotes popup every 30 seconds
-  useEffect(() => {
-    // Show first quote after 5 seconds
-    const initialTimer = setTimeout(() => {
-      setShowQuote(true);
-    }, 5000);
-
-    // Rotate quotes every 30 seconds
-    const quoteInterval = setInterval(() => {
-      setShowQuote(false);
-      setTimeout(() => {
-        setCurrentQuote((prev) => (prev + 1) % quotes.length);
-        setShowQuote(true);
-      }, 500); // Small delay for animation
-    }, 30000);
-
-    return () => {
-      clearTimeout(initialTimer);
-      clearInterval(quoteInterval);
-    };
-  }, []);
-
-  const handleDownload = async () => {
-    try {
-      // Send notification
-      await fetch('/api/download-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Anonymous', timestamp: new Date().toISOString() }),
-      });
-    } catch (error) {
-      console.error('Failed to send notification:', error);
-    }
-
-    // Trigger download immediately
-    const link = document.createElement('a');
-    link.href = '/cv.pdf';
-    link.download = 'Hani-Mohamed-Sayed-CV.pdf';
-    link.click();
-  };
-
+/* ─── Bug Finder Animation ─── */
+function BugFinderAnimation() {
   return (
-    <main className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute inset-0 overflow-hidden">
+    <div className="relative w-full max-w-[500px] aspect-square rounded overflow-hidden bg-[#23262f] border border-[#333333] flex flex-col shadow-2xl">
+      {/* Mock IDE Window Header */}
+      <div className="w-full h-12 bg-[#1a1c23] border-b border-[#333333] flex items-center px-6 gap-3 z-20 relative">
+        <div className="w-3 h-3 rounded-full bg-gray-600" />
+        <div className="w-3 h-3 rounded-full bg-gray-600" />
+        <div className="w-3 h-3 rounded-full bg-gray-600" />
+        <span className="ml-4 text-gray-500 text-xs font-mono tracking-widest">test_runner.java</span>
+      </div>
+
+      {/* Code Blocks Area */}
+      <div className="w-full flex-grow p-10 flex flex-col gap-8 relative z-10 overflow-hidden bg-[#23262f]">
+        {/* Line 1 */}
+        <div className="w-3/4 h-3 bg-[#333333] rounded-sm" />
+        {/* Line 2 */}
+        <div className="w-1/2 h-3 bg-[#333333] rounded-sm" />
+        {/* Line 3 - The Bug */}
+        <div className="relative flex items-center gap-3">
+          <div className="w-2/3 h-3 bg-[#333333] rounded-sm" />
+          {/* Bug Icon */}
           <motion.div
-            className="absolute top-20 left-20 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-            animate={{ x: [0, 100, 0], y: [0, -50, 0] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          />
+            initial={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: [1, 1, 0], scale: [1, 1.2, 0] }}
+            transition={{ duration: 3, repeat: Infinity, repeatDelay: 1, times: [0, 0.6, 1] }}
+            className="absolute right-6 text-coral"
+          >
+            <Bug size={18} />
+          </motion.div>
+          {/* Check Icon */}
           <motion.div
-            className="absolute bottom-20 right-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-            animate={{ x: [0, -100, 0], y: [0, 50, 0] }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          />
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: [0, 0, 1, 1, 0], scale: [0, 0, 1, 1, 0] }}
+            transition={{ duration: 3, repeat: Infinity, repeatDelay: 1, times: [0, 0.6, 0.75, 0.95, 1] }}
+            className="absolute right-6 text-green-400"
+          >
+            <CheckCircle size={18} />
+          </motion.div>
         </div>
+        {/* Line 4 */}
+        <div className="w-1/3 h-3 bg-[#333333] rounded-sm" />
+        {/* Line 5 */}
+        <div className="w-4/5 h-3 bg-[#333333] rounded-sm" />
+        {/* Line 6 */}
+        <div className="w-1/2 h-3 bg-[#333333] rounded-sm" />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 py-20">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-indigo-600 font-semibold mb-4 flex items-center gap-2"
-              >
-                <Sparkles size={20} />
-                Software Test Engineer
-              </motion.p>
-
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                Hi, I am <span className="gradient-text">Hani Mohamed</span>
-              </h1>
-
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                <span className="font-semibold text-indigo-600">ISTQB Certified</span> QA Engineer with <span className="font-semibold text-indigo-600">2+ years</span> of expertise in manual & automated testing, API testing, and performance engineering.
-                Delivering quality across <span className="font-semibold text-indigo-600">web, mobile, and enterprise applications</span> in diverse industries.
-              </p>
-
-              <motion.blockquote
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-lg italic text-gray-700 mb-8 pl-4 border-l-4 border-indigo-600"
-              >
-                "Ain't no map for this life road; we draw it our own way, and love keeps it real"
-              </motion.blockquote>
-
-              <div className="flex flex-wrap gap-4 mb-8">
-                <motion.button
-                  onClick={handleDownload}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-                >
-                  <Download size={20} />
-                  Download CV
-                </motion.button>
-
-                <motion.a
-                  href="#contact"
-                  whileHover={{ scale: 1.05 }}
-                  className="px-8 py-4 border-2 border-indigo-600 text-indigo-600 rounded-full font-semibold hover:bg-indigo-50 transition-all"
-                >
-                  Contact Me
-                </motion.a>
-              </div>
-
-              <div className="flex gap-4">
-                {[
-                  { icon: Github, href: 'https://github.com/HaniASU' },
-                  { icon: Linkedin, href: 'https://www.linkedin.com/in/hani-mohamed-qa/' },
-                  { icon: Mail, href: 'mailto:hani.mohamedqa@gmail.com' },
-                ].map((social, i) => (
-                  <motion.a
-                    key={i}
-                    href={social.href}
-                    whileHover={{ scale: 1.1, y: -2 }}
-                    className="p-3 bg-white rounded-full shadow-md hover:shadow-lg transition-all"
-                  >
-                    <social.icon size={24} className="text-gray-700" />
-                  </motion.a>
-                ))}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="relative w-full aspect-square max-w-md mx-auto">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl rotate-6 opacity-20"></div>
-                <div className="relative bg-gradient-to-br from-indigo-500 to-purple-500 rounded-3xl p-8 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <CheckCircle2 size={120} className="mx-auto mb-4 float" />
-                    <p className="text-2xl font-bold">Software Test Engineer</p>
-                    <p className="text-indigo-100">ISTQB Certified</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
+        {/* Flat Scanner Line */}
         <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          initial={{ top: '48px' }}
+          animate={{ top: ['48px', 'calc(100% - 64px)', '48px'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
+          className="absolute w-full h-16 bg-coral/5 border-y-2 border-coral/30 pointer-events-none z-30"
+        />
+
+        {/* Test Status Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: [0, 0, 1, 1, 0], y: [10, 10, 0, 0, 10] }}
+          transition={{ duration: 3, repeat: Infinity, repeatDelay: 1, times: [0, 0.6, 0.75, 0.95, 1] }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-white text-[#1a1c23] px-8 py-3 rounded-sm font-sans text-xs font-bold shadow-xl flex items-center gap-3 z-40 whitespace-nowrap uppercase tracking-widest border border-gray-200"
         >
-          <div className="w-6 h-10 border-2 border-indigo-600 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-indigo-600 rounded-full mt-2"></div>
-          </div>
+          <CheckCircle size={14} className="text-green-500" />
+          All Tests Passed
         </motion.div>
-      </section>
+      </div>
+    </div>
+  );
+}
 
-      {/* Stats */}
-      <section className="py-14 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { value: '2+', label: 'Years Experience', icon: Briefcase },
-              { value: 'ISTQB', label: 'Certified Tester', icon: Award },
-              { value: '5+', label: 'Projects Delivered', icon: CheckCircle2 },
-              { value: '80%', label: 'Bug Detection Rate', icon: Code },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-3">
-                  <stat.icon className="text-indigo-600" size={32} />
-                </div>
-                <div className="text-4xl font-bold gradient-text mb-1">{stat.value}</div>
-                <div className="text-gray-600">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Projects */}
-      <section id="projects" className="py-10 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-2">
-              Working <span className="gradient-text">Projects</span>
-            </h2>
-            <p className="text-gray-600 text-lg">Domain Expertise</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {[
-              {
-                name: 'Tracking Management System',
-                domain: 'Logistics',
-                tech: ['Manual Testing', 'UI Testing', 'API Testing', 'Azure DevOps'],
-                status: 'active',
-                bgColor: 'from-emerald-50 to-teal-50',
-                borderColor: 'border-emerald-200'
-              },
-              {
-                name: 'E-Justice',
-                domain: 'Legal Services',
-                tech: ['Manual Testing', 'UI Testing', 'Postman', 'Mobile Testing'],
-                status: 'completed',
-                bgColor: 'from-indigo-50 to-purple-50',
-                borderColor: 'border-indigo-200'
-              },
-              {
-                name: 'Key2Bus',
-                domain: 'Transportation',
-                tech: ['Mobile Testing', 'API Testing', 'GPS Tracking'],
-                status: 'completed',
-                bgColor: 'from-purple-50 to-pink-50',
-                borderColor: 'border-purple-200'
-              },
-              {
-                name: 'Consultant Platform',
-                domain: 'Professional Services',
-                tech: ['Selenium WebDriver', 'Gatling', 'Performance Testing'],
-                status: 'completed',
-                bgColor: 'from-cyan-50 to-blue-50',
-                borderColor: 'border-cyan-200'
-              },
-              {
-                name: 'Maktaby & Helpdesk',
-                domain: 'Government',
-                tech: ['Cross-platform', 'TestNG', 'Database Testing'],
-                status: 'completed',
-                bgColor: 'from-green-50 to-emerald-50',
-                borderColor: 'border-green-200'
-              },
-            ].map((project, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`bg-gradient-to-br ${project.bgColor} p-4 rounded-xl border-2 ${project.borderColor} card-hover`}
-              >
-                {project.status === 'active' && (
-                  <span className="inline-block px-2 py-1 bg-emerald-500 text-white text-xs font-semibold rounded-full mb-2">
-                    In Progress
-                  </span>
-                )}
-                <h3 className="font-bold text-gray-900 text-base mb-1">{project.name}</h3>
-                <p className="text-sm text-gray-600 font-medium mb-3">{project.domain}</p>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {project.tech.map((t, j) => (
-                    <span key={j} className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Experience */}
-      <section id="experience" className="py-10 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-2">
-              Work <span className="gradient-text">Experience</span>
-            </h2>
-            <p className="text-gray-600 text-lg">Professional Journey</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-xl border-2 border-indigo-200 card-hover"
-            >
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Software Test Engineer</h3>
-              <p className="text-indigo-600 font-semibold text-sm mb-1">Step by Step Software</p>
-              <p className="text-gray-600 text-xs mb-3">Jan 2024 - Present · Full-time</p>
-              <p className="text-gray-700 leading-relaxed mb-3 text-sm">
-                Software Test Engineer with hands-on experience in mobile and web app testing. Excel in various testing
-                methods and quality assurance processes, including manual and automated testing using Selenium and API testing with Postman.
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Azure DevOps</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Test Automation</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">+27 skills</span>
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-purple-200 card-hover"
-            >
-              <h3 className="text-lg font-bold text-gray-900 mb-1">ManuTech Community</h3>
-              <p className="text-purple-600 font-semibold text-sm mb-1">Chamber of IT & Telecommunication</p>
-              <p className="text-gray-600 text-xs mb-3">Nov 2023 - Present · 2 years 2 months</p>
-              <p className="text-gray-700 leading-relaxed mb-3 text-sm">
-                Member of ManuTech, an integrated initiative supporting digital transformation in the manufacturing sector.
-                Selected participant in the ManuTech Challenge Boot Camp, focusing on manufacturing technology innovation.
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Manufacturing</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Digital Transformation</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">+5 skills</span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Education */}
-      <section id="education" className="py-10 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-2">
-              <span className="gradient-text">Education</span>
-            </h2>
-            <p className="text-gray-600 text-lg">Academic Foundation</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-2xl mx-auto"
-          >
-            <div className="bg-gradient-to-br from-cyan-50 to-blue-50 p-4 rounded-xl border-2 border-cyan-200 card-hover">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Faculty of Computer and Information Sciences</h3>
-              <p className="text-cyan-600 font-semibold text-sm mb-1">Ain Shams University</p>
-              <p className="text-gray-600 text-xs mb-3">Bachelor's degree · Sep 2019 - Jul 2023</p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Computer Science</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Test Automation</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Software Engineering</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Skills */}
-      <section id="skills" className="py-10 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-2">
-              Skills & <span className="gradient-text">Expertise</span>
-            </h2>
-            <p className="text-gray-600 text-lg">Technical Arsenal</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                title: 'Test Automation',
-                bgColor: 'from-indigo-50 to-purple-50',
-                borderColor: 'border-indigo-200',
-                skills: ['Selenium WebDriver', 'TestNG', 'SHAFT Engine', 'RestAssured', 'Cucumber', 'Data-Driven Testing'],
-              },
-              {
-                title: 'API & Performance',
-                bgColor: 'from-cyan-50 to-blue-50',
-                borderColor: 'border-cyan-200',
-                skills: ['Postman', 'REST API', 'Gatling', 'Load Testing', 'JMeter', 'API Security'],
-              },
-              {
-                title: 'Development & Tools',
-                bgColor: 'from-purple-50 to-pink-50',
-                borderColor: 'border-purple-200',
-                skills: ['Java', 'JavaScript', 'Azure DevOps', 'Git', 'Jira', 'CI/CD Pipelines'],
-              },
-              {
-                title: 'Domain Expertise',
-                bgColor: 'from-emerald-50 to-teal-50',
-                borderColor: 'border-emerald-200',
-                skills: ['Manufacturing', 'Legal Tech', 'Government', 'Mobile Apps'],
-              },
-            ].map((cat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className={`bg-gradient-to-br ${cat.bgColor} p-4 rounded-xl border-2 ${cat.borderColor} card-hover`}
-              >
-                <h3 className="text-base font-bold text-gray-900 mb-3">{cat.title}</h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {cat.skills.map((skill, j) => (
-                    <span key={j} className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Certifications */}
-      <section id="certifications" className="py-10 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-2">
-              <span className="gradient-text">Certifications</span>
-            </h2>
-            <p className="text-gray-600 text-lg">Continuous Learning & Professional Development</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 rounded-xl border-2 border-emerald-200 card-hover"
-            >
-              <h3 className="text-lg font-bold text-gray-900 mb-1">ISTQB Certified Tester</h3>
-              <p className="text-emerald-600 font-semibold text-sm mb-2">Foundation Level</p>
-              <p className="text-gray-600 text-xs">International Software Testing Qualifications Board</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-xl border-2 border-amber-200 card-hover"
-            >
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Test Automation: Leveling Up</h3>
-              <p className="text-amber-600 font-semibold text-sm mb-2">60 Hours Training Course</p>
-              <p className="text-gray-600 text-xs mb-3">Advanced test automation with Selenium & API testing</p>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">Selenium WebDriver</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">SHAFT Engine</span>
-                <span className="px-2 py-1 bg-white/80 text-gray-700 rounded text-xs font-medium">RestAssured</span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Passions & Interests */}
-      <section className="py-10 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-2">
-              Beyond <span className="gradient-text">Testing</span>
-            </h2>
-            <p className="text-gray-600 text-lg">What Drives Me Forward</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-xl border-2 border-indigo-200 card-hover"
-            >
-              <h3 className="text-base font-bold text-gray-900 mb-2">Continuous Learning</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Passionate about exploring new testing methodologies, automation frameworks, and emerging technologies.
-                Always seeking opportunities to expand my knowledge and stay ahead in the QA field.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-purple-200 card-hover"
-            >
-              <h3 className="text-base font-bold text-gray-900 mb-2">Manufacturing & AI Solutions</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Deep interest in manufacturing systems powered by artificial intelligence. Exploring AI-based solutions
-                that optimize production processes, enhance quality control, and drive intelligent automation in manufacturing environments.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-cyan-50 to-blue-50 p-4 rounded-xl border-2 border-cyan-200 card-hover"
-            >
-              <h3 className="text-base font-bold text-gray-900 mb-2">Innovation & Experimentation</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Love trying new tools, frameworks, and approaches. From AI-powered testing to performance optimization,
-                I embrace challenges that push the boundaries of quality assurance.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Reflections Section */}
-      <section className="py-10 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-2">
-              <span className="gradient-text">Reflections & Memories</span>
-            </h2>
-            <p className="text-gray-600 text-lg">Coming Soon</p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-xl border-2 border-indigo-200 card-hover"
-            >
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Life Stories</h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                A collection of personal experiences, reflections, and moments that shaped my journey in technology and life.
-              </p>
-              <div className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-lg text-xs font-semibold inline-block">
-                Coming Soon
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-xl border-2 border-purple-200 card-hover"
-            >
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Soul Fragments</h3>
-              <p className="text-gray-600 text-sm leading-relaxed mb-4">
-                Thoughts, philosophical musings, and introspective writings about the intersection of technology, humanity, and growth.
-              </p>
-              <div className="px-4 py-2 bg-purple-100 text-purple-800 rounded-lg text-xs font-semibold inline-block">
-                Coming Soon
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact */}
-      <section id="contact" className="py-14 bg-gradient-to-br from-indigo-600 to-purple-600 text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Let's Work Together</h2>
-            <p className="text-xl text-indigo-100 mb-6">
-              Open to discussing new projects and opportunities
-            </p>
-            <motion.a
-              href="mailto:hani.mohamedqa@gmail.com"
-              whileHover={{ scale: 1.05 }}
-              className="px-8 py-4 bg-white text-indigo-600 rounded-full font-semibold shadow-lg inline-flex items-center gap-2"
-            >
-              <Mail size={20} />
-              Get In Touch
-            </motion.a>
-          </motion.div>
-        </div>
-      </section>
-
-      <footer className="py-8 bg-gray-900 text-gray-400 text-center">
-        <p>© 2026 Hani Mohamed</p>
-      </footer>
-
-      {/* Rotating Quote Popup */}
+/* ─── ISTQB Badge Graphic ─── */
+function IstqbBadgeGraphic() {
+  return (
+    <div className="flex items-center justify-center select-none py-12">
       <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: showQuote ? 1 : 0, y: showQuote ? 0 : 50 }}
-        transition={{ duration: 0.5 }}
-        className="fixed bottom-32 right-8 max-w-md z-50 pointer-events-none"
+        whileHover={{ scale: 1.05, rotate: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+        className="relative flex flex-col items-center justify-center border-4 border-coral rounded-full w-60 h-60 bg-[#1a1c23] shadow-2xl p-6"
       >
-        <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white p-6 rounded-2xl shadow-2xl border-2 border-white/20">
-          <div className="flex items-start gap-3">
-            <Sparkles className="flex-shrink-0 mt-1" size={24} />
-            <div>
-              <p className="text-lg font-medium mb-2 leading-relaxed">&ldquo;{quotes[currentQuote].text}&rdquo;</p>
-              <p className="text-indigo-100 text-sm">— {quotes[currentQuote].author}</p>
-              <span className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
-                {quotes[currentQuote].category}
-              </span>
-            </div>
-          </div>
+        {/* SVG Certified Tester Shield/Seal */}
+        <div className="flex flex-col items-center text-center">
+          <span className="text-coral text-4xl font-display font-extrabold tracking-wide uppercase mb-1">ISTQB</span>
+          <span className="text-white text-[10px] font-bold tracking-[0.25em] uppercase border-y border-gray-600 py-2 w-36 mb-1">CERTIFIED</span>
+          <span className="text-coral text-sm font-bold tracking-widest uppercase mt-1">TESTER</span>
         </div>
       </motion.div>
+    </div>
+  );
+}
 
+export default function Home() {
+  const [typedText, setTypedText] = useState('');
+  const targetText = 'I Am Hani Mohamed';
+
+  useEffect(() => {
+    let index = 0;
+    const timer = setInterval(() => {
+      setTypedText(targetText.substring(0, index + 1));
+      index++;
+      if (index >= targetText.length) {
+        clearInterval(timer);
+      }
+    }, 120);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const hasTracked = sessionStorage.getItem('portfolio-tracked');
+    if (!hasTracked) {
+      sessionStorage.setItem('portfolio-tracked', 'true');
+      fetch('/api/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timestamp: Date.now(),
+          page: window.location.pathname,
+        }),
+      }).catch((err) => console.error('Error sending tracking event:', err));
+    }
+  }, []);
+
+  return (
+    <div className="font-sans">
+      {/* Navbar (Dark) */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1a1c23]/95 backdrop-blur border-b border-[#333333]">
+        <div className="max-w-7xl mx-auto px-8 md:px-16 py-5 flex justify-between items-center">
+          <div className="text-3xl font-display font-bold text-coral tracking-tight">
+            Hani
+          </div>
+          <div className="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest uppercase text-gray-400">
+            <a href="#" className="hover:text-coral transition-colors">Home</a>
+            <a href="#about" className="hover:text-coral transition-colors">About</a>
+            <a href="#experience" className="hover:text-coral transition-colors">Experience</a>
+            <a href="#academics" className="hover:text-coral transition-colors">Academics</a>
+            <a href="#portfolio" className="hover:text-coral transition-colors">Projects</a>
+            <a href="#credentials" className="hover:text-coral transition-colors">Certificates</a>
+            <a href="#skills" className="hover:text-coral transition-colors">Skills</a>
+          </div>
+        </div>
+      </nav>
+
+      <main className="min-h-screen bg-[#1a1c23]">
+
+        {/* Hero Section (Dark) */}
+        <section className="bg-[#1a1c23] min-h-screen flex items-center pt-24 pb-16">
+          <div className="max-w-7xl mx-auto px-8 md:px-16 w-full">
+            <div className="flex flex-col lg:flex-row items-center gap-16">
+              {/* Text Side */}
+              <div className="flex-1 w-full">
+                <h3 className="text-coral font-bold text-sm tracking-widest mb-4 uppercase">Hello!</h3>
+                <h1 className="text-4xl md:text-6xl font-display font-bold text-white leading-tight mb-2">
+                  <span className="typewriter-caret pr-2">{typedText}</span>
+                </h1>
+                <p className="text-base md:text-lg italic text-gray-300 font-sans font-semibold tracking-wide mb-8 opacity-90">
+                  &ldquo;Ain&apos;t no map for this life road; we draw it our own way, and love keeps it real&rdquo;
+                </p>
+                <div className="mb-10 pl-4 border-l-2 border-coral">
+                  <p className="text-gray-400 font-sans text-base md:text-lg leading-relaxed">
+                    I&apos;m a Software Test Engineer with over 2+ years of extensive experience. My expertise is to ensure flawless execution, UI testing, API integration, and performance validation across multiple platforms.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-4">
+                  <a href="#portfolio" className="bg-coral hover:bg-coral/90 text-white px-8 py-3.5 rounded-full font-bold tracking-widest uppercase transition-all shadow-lg hover:-translate-y-0.5 inline-block text-xs">View Work</a>
+                  <a href="/Hani-Mohamed-Sayed-Software Test Engineer.pdf" target="_blank" rel="noreferrer" className="bg-coral hover:bg-coral/90 text-white px-8 py-3.5 rounded-full font-bold tracking-widest uppercase transition-all shadow-lg hover:-translate-y-0.5 inline-block text-xs">Download CV</a>
+                </div>
+                <div className="flex items-center gap-6 mt-10">
+                  <a href="https://github.com/HaniASU" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-coral transition-colors"><Github size={20} /></a>
+                  <a href="https://www.linkedin.com/in/hani-mohamed-qa/" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-coral transition-colors"><Linkedin size={20} /></a>
+                  <a href="mailto:hani.mohamedqa@gmail.com" className="text-gray-400 hover:text-coral transition-colors"><Mail size={20} /></a>
+                </div>
+              </div>
+              {/* Animation Side */}
+              <div className="flex-1 flex justify-center">
+                <BugFinderAnimation />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* About Section (Light) */}
+        <section id="about" className="bg-light-section py-32">
+          <div className="max-w-7xl mx-auto px-8 md:px-16">
+            <div className="flex flex-col lg:flex-row items-center gap-16">
+              {/* Left Side: ISTQB Certification Emblem */}
+              <div className="flex-1 flex justify-center w-full">
+                <motion.div
+                  initial={{ opacity: 0, x: -40 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <IstqbBadgeGraphic />
+                </motion.div>
+              </div>
+
+              {/* Right Text Content */}
+              <div className="flex-1 w-full">
+                <h3 className="text-coral font-bold tracking-widest uppercase mb-2 text-sm">About Me</h3>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-[#1a1c23] mb-8">
+                  I Am Passionate <span className="text-coral">Test Engineer</span>
+                </h2>
+                <p className="text-gray-600 font-sans leading-relaxed mb-8 text-sm md:text-base">
+                  Dedicated to ensuring software quality through comprehensive testing strategies. I bridge the gap between development and production by catching critical issues before they reach end users.
+                </p>
+
+                {/* Stats Row */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+                  <div className="text-center">
+                    <h4 className="text-coral font-display font-bold text-3xl mb-1">2+</h4>
+                    <p className="text-gray-500 text-[10px] uppercase tracking-widest font-bold">Years Exp.</p>
+                  </div>
+                  <div className="text-center">
+                    <h4 className="text-coral font-display font-bold text-3xl mb-1">5+</h4>
+                    <p className="text-gray-500 text-[10px] uppercase tracking-widest font-bold">Projects</p>
+                  </div>
+                  <div className="text-center">
+                    <h4 className="text-coral font-display font-bold text-3xl mb-1">27+</h4>
+                    <p className="text-gray-500 text-[10px] uppercase tracking-widest font-bold">Test Cases</p>
+                  </div>
+                  <div className="text-center">
+                    <h4 className="text-coral font-display font-bold text-3xl mb-1">99%</h4>
+                    <p className="text-gray-500 text-[10px] uppercase tracking-widest font-bold">Quality Rate</p>
+                  </div>
+                </div>
+                <a href="#experience" className="bg-coral hover:bg-coral/90 text-white px-8 py-3.5 rounded-full font-bold tracking-widest uppercase transition-all shadow-lg hover:-translate-y-0.5 inline-block text-xs">My Experience</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Experience Section (Dark) */}
+        <section id="experience" className="bg-[#1a1c23] py-32 border-y border-[#333333]">
+          <div className="max-w-4xl mx-auto px-8 md:px-16 text-center">
+            <h3 className="text-coral font-bold tracking-widest uppercase mb-2">Career</h3>
+            <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-16">My Experience</h2>
+            <div className="relative border-l-2 border-[#333333] ml-4 pl-12 text-left">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mb-12 relative"
+              >
+                <div className="absolute -left-[49px] top-1 w-5 h-5 rounded-full border-4 border-[#1a1c23] bg-coral" />
+                <span className="text-coral font-bold text-sm mb-2 block">Jan 2024 - Present</span>
+                <h4 className="text-2xl font-display font-bold text-white mb-1 flex items-center flex-wrap gap-3">
+                  Software Test Engineer
+                  <span className="text-coral bg-coral/10 border border-coral/20 px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider select-none">
+                    Full-time
+                  </span>
+                </h4>
+                <p className="text-gray-400 font-sans mb-4">Step by Step Software</p>
+                <p className="text-gray-400 font-sans text-sm leading-relaxed">
+                  Software Test Engineer with hands-on experience in mobile and web app testing. Excel in various testing methods and quality assurance processes, including manual and automated testing using Selenium and API testing with Postman.
+                </p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="relative"
+              >
+                <div className="absolute -left-[49px] top-1 w-5 h-5 rounded-full border-4 border-[#1a1c23] bg-[#333333]" />
+                <span className="text-coral font-bold text-sm mb-2 block">Nov 2023 - Present</span>
+                <h4 className="text-2xl font-display font-bold text-white mb-1">ManuTech Community</h4>
+                <p className="text-gray-400 font-sans mb-4">Chamber of IT & Telecommunication</p>
+                <p className="text-gray-400 font-sans text-sm leading-relaxed">
+                  Member of ManuTech, an integrated initiative supporting digital transformation in the manufacturing sector. Selected participant in the ManuTech Challenge Boot Camp, focusing on manufacturing technology innovation.
+                </p>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Academics Section (Light) */}
+        <section id="academics" className="bg-light-section py-32 border-y border-gray-200">
+          <div className="max-w-7xl mx-auto px-8 md:px-16">
+            <div className="text-center mb-20">
+              <h3 className="text-coral font-bold tracking-widest uppercase mb-2">Education</h3>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1a1c23]">Academics</h2>
+            </div>
+            <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white p-10 border-t-4 border-coral shadow-lg group hover:shadow-xl transition-shadow relative overflow-hidden"
+              >
+                <span className="text-coral font-bold text-sm tracking-widest uppercase">Sep 2019 - Jul 2023</span>
+                <h4 className="text-2xl font-display font-bold text-[#1a1c23] mb-1 mt-2">Bachelor's Degree</h4>
+                <p className="text-gray-600 font-sans font-semibold text-sm">Faculty of Computer and Information Sciences</p>
+                <p className="text-gray-500 font-sans text-xs mt-1">Ain Shams University</p>
+                <div className="absolute top-6 right-[-30px] bg-coral text-white text-[10px] font-bold tracking-widest uppercase px-10 py-1 rotate-45 shadow-md">
+                  Graduate
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-white p-10 border-t-4 border-gray-300 shadow-lg group hover:shadow-xl transition-shadow relative overflow-hidden"
+              >
+                <span className="text-gray-500 font-bold text-sm tracking-widest uppercase">In Progress</span>
+                <h4 className="text-2xl font-display font-bold text-[#1a1c23] mb-1 mt-2">Diploma in Digital Payments & FinTech</h4>
+                <p className="text-gray-600 font-sans font-semibold text-sm">LSBR</p>
+                <p className="text-gray-500 font-sans text-xs mt-1">Self-study</p>
+                <div className="absolute top-6 right-[-30px] bg-gray-400 text-white text-[10px] font-bold tracking-widest uppercase px-10 py-1 rotate-45 shadow-md">
+                  Self-Study
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Technical Projects Section (Dark) */}
+        <section id="portfolio" className="bg-[#1a1c23] py-32 border-y border-[#333333]">
+          <div className="max-w-7xl mx-auto px-8 md:px-16">
+            <div className="text-center mb-20">
+              <h3 className="text-coral font-bold tracking-widest uppercase mb-2">Projects</h3>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-white">Technical Projects</h2>
+            </div>
+
+            {/* Interactive Row Portfolio Design */}
+            <div className="divide-y divide-[#333333]">
+              {workingProjects.map((project, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="flex flex-col lg:flex-row items-start lg:items-center gap-8 py-12 group cursor-default"
+                >
+                  {/* Left: Domain & Name */}
+                  <div className="lg:w-1/2">
+                    <span className="text-coral text-xs font-bold tracking-widest uppercase block mb-3">{project.domain}</span>
+                    <h3 className="text-3xl md:text-4xl font-display font-bold text-white group-hover:text-coral transition-colors">{project.name}</h3>
+                  </div>
+                  {/* Middle: Summary */}
+                  <div className="lg:w-1/3">
+                    <p className="text-gray-400 font-sans leading-relaxed text-sm">{project.summary}</p>
+                  </div>
+                  {/* Right: Tech Stack */}
+                  <div className="lg:w-1/3 flex items-center justify-end">
+                    <div className="flex flex-wrap gap-2 lg:justify-end">
+                      {project.tech.map((t, j) => (
+                        <span key={j} className="text-xs font-semibold bg-[#1a1c23] text-gray-300 px-3 py-1.5 rounded border border-[#333333] group-hover:border-coral/50 transition-colors">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Professional Credentials Section (Light) */}
+        <section id="credentials" className="bg-light-section py-32">
+          <div className="max-w-7xl mx-auto px-8 md:px-16">
+            <div className="text-center mb-20">
+              <h3 className="text-coral font-bold tracking-widest uppercase mb-2">Qualifications</h3>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1a1c23]">Certificates</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
+
+              {/* ISTQB Credential */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white p-10 rounded border-t-4 border-coral shadow-lg text-center group transition-colors flex flex-col h-full"
+              >
+                <Award className="text-coral w-12 h-12 mx-auto mb-6 group-hover:scale-110 transition-transform" />
+                <h4 className="text-2xl font-display font-bold text-[#1a1c23] mb-2">ISTQB Foundation Level</h4>
+                <p className="text-gray-400 font-sans text-sm mb-4">International Software Testing Qualifications Board</p>
+                <p className="text-coral font-bold text-sm tracking-widest uppercase mb-8 flex-grow">ID: 251117042</p>
+
+                <div className="mt-auto">
+                  <a href="https://scr.istqb.org/?number=251117042" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-coral hover:bg-coral/80 text-white px-6 py-3 rounded font-bold tracking-widest uppercase transition-all shadow-lg hover:-translate-y-1 text-sm">
+                    View Certificate <ExternalLink size={16} />
+                  </a>
+                </div>
+              </motion.div>
+
+              {/* Test Automation Credential */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-white p-10 rounded border-t-4 border-coral shadow-lg text-center group transition-colors flex flex-col h-full"
+              >
+                <Award className="text-coral w-12 h-12 mx-auto mb-6 group-hover:scale-110 transition-transform" />
+                <h4 className="text-2xl font-display font-bold text-[#1a1c23] mb-2">Test Automation: Leveling Up</h4>
+                <p className="text-gray-400 font-sans text-sm mb-4">60 Hours Training Course</p>
+                <p className="text-gray-400 font-sans text-sm leading-relaxed mb-6">Advanced test automation with Selenium &amp; API testing</p>
+
+                <div className="flex flex-wrap justify-center gap-2 mb-8 flex-grow content-start">
+                  <span className="text-xs font-semibold bg-gray-50 text-gray-700 px-3 py-1 rounded border border-gray-200">Selenium WebDriver</span>
+                  <span className="text-xs font-semibold bg-gray-50 text-gray-700 px-3 py-1 rounded border border-gray-200">SHAFT Engine</span>
+                  <span className="text-xs font-semibold bg-gray-50 text-gray-700 px-3 py-1 rounded border border-gray-200">RestAssured</span>
+                </div>
+
+                <div className="mt-auto">
+                  <a href="https://drive.google.com/file/d/1NTqbBIq3H2cQjVhyGS8q1biVdDrkHwDu/view?usp=drive_link" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-coral hover:bg-coral/80 text-white px-6 py-3 rounded font-bold tracking-widest uppercase transition-all shadow-lg hover:-translate-y-1 text-sm">
+                    View Certificate <ExternalLink size={16} />
+                  </a>
+                </div>
+              </motion.div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* Self-Initiated Technical Prototypes Section (Different Dark) */}
+        <section id="prototypes" className="bg-[#23262f] py-32 border-y border-[#333333]">
+          <div className="max-w-7xl mx-auto px-8 md:px-16">
+            <div className="text-center mb-20">
+              <h3 className="text-coral font-bold tracking-widest uppercase mb-2">Innovation</h3>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-white">Self-Initiated Technical Prototypes</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-10">
+              {technicalPrototypes.map((proto, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-[#1a1c23] p-10 border-t-4 border-[#333333] hover:border-coral transition-colors shadow-lg group"
+                >
+                  <div className="flex justify-between items-start mb-6">
+                    <span className="text-gray-400 font-bold text-sm tracking-widest uppercase group-hover:text-coral transition-colors mt-2">{proto.domain}</span>
+                    {proto.link && (
+                      <a href={proto.link} target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-coral/20 border border-coral/30 text-coral px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase shadow-sm" title="View Project">
+                        Live Demo <ArrowUpRight size={16} />
+                      </a>
+                    )}
+                  </div>
+                  <h4 className="text-2xl font-display font-bold text-white mb-4">{proto.name}</h4>
+                  <p className="text-gray-400 font-sans leading-relaxed mb-8">{proto.summary}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {proto.tech.map((t, j) => (
+                      <span key={j} className="text-xs font-semibold bg-[#23262f] text-gray-400 px-3 py-1.5 rounded border border-[#333333] group-hover:border-coral/30 transition-colors">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Skills & Expertise Section (Light) */}
+        <section id="skills" className="bg-light-section py-32 border-y border-gray-200">
+          <div className="max-w-7xl mx-auto px-8 md:px-16">
+            <div className="text-center mb-20">
+              <h3 className="text-coral font-bold tracking-widest uppercase mb-2">Technical Arsenal</h3>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-[#1a1c23]">Skills &amp; Expertise</h2>
+            </div>
+
+            {/* Sleek 4-Column Skills List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+              {skillCategories.map((category, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                >
+                  <div className="border-b-2 border-gray-200 pb-4 mb-8">
+                    <h3 className="text-xl font-display font-bold text-[#1a1c23] flex items-center gap-3">
+                      <CheckCircle className="text-coral w-5 h-5" />
+                      {category.title}
+                    </h3>
+                  </div>
+                  <ul className="space-y-4">
+                    {category.skills.map((skill, index) => (
+                      <li key={index} className="text-gray-600 font-sans font-semibold flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-sm bg-gray-300" />
+                        {skill}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Merged Contact Block */}
+            <div id="contact" className="max-w-4xl mx-auto text-center mt-32 pt-32 border-t border-gray-200">
+              <h2 className="text-4xl md:text-5xl font-display font-bold mb-6 text-[#1a1c23]">Let&apos;s Work Together</h2>
+              <p className="text-gray-600 font-sans text-lg mb-12">I&apos;m currently available for freelance work or full-time opportunities. If you have a project that needs a quality architect, let&apos;s talk.</p>
+
+              <div className="mt-8">
+                <a href="mailto:hani.mohamedqa@gmail.com" className="bg-coral hover:bg-coral/80 text-white text-lg px-12 py-4 rounded font-bold tracking-widest uppercase transition-all shadow-lg hover:-translate-y-1 inline-block">Hire Me Now</a>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-[#1a1c23] py-8 text-center border-t border-[#333333]">
+          <p className="text-gray-500 font-sans text-sm tracking-widest uppercase">
+            &copy; {new Date().getFullYear()} Hani Mohamed · Software Test Engineer
+          </p>
+        </footer>
+
+      </main>
       <AIChat />
-    </main>
+    </div>
   );
 }

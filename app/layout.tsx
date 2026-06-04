@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { Poppins, Open_Sans } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const openSans = Open_Sans({
-  variable: "--font-open-sans",
+const geistSans = Geist({
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const poppins = Poppins({
-  weight: ["400", "600", "700"],
-  variable: "--font-poppins",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Hani Mohamed | Portfolio",
-  description: "Professional portfolio of Hani Mohamed, Software Test Engineer.",
+  title: "Hani Mohamed - Software Test Engineer | ISTQB Certified QA",
+  description: "Professional portfolio of Hani Mohamed, an ISTQB Certified Software Test Engineer with 2+ years of experience in manual & automated testing, API testing, and performance engineering.",
 };
 
 export default function RootLayout({
@@ -24,9 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body
-        className={`${openSans.variable} ${poppins.variable} antialiased font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
       </body>

@@ -72,7 +72,7 @@ You'll know:
 1. **Automatic Page Load Tracking**
    - JavaScript runs when visitor loads the page
    - Tracks only once per browser session (using `sessionStorage`)
-   - Sends visitor data to `/api/visitor-tracking`
+   - Sends visitor data to `/api/session`
 
 2. **Server-Side Data Collection**
    - Captures real IP address from request headers
@@ -146,7 +146,7 @@ Portfolio appears in search → See organic traffic from Google
 
 Want to change the notification appearance? Edit these files:
 
-- **Notification Format**: `app/api/visitor-tracking/route.ts`
+- **Notification Format**: `app/api/session/route.ts`
 - **Tracking Logic**: `app/page.tsx` (useEffect hook)
 - **Platform Detection**: `detectSourcePlatform()` function in route.ts
 
